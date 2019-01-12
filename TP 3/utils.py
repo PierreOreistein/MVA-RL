@@ -40,3 +40,16 @@ def collect_episodes(mdp, policy=None, horizon=None, n_episodes=1, render=False)
 def discretization_2d(x, y, binx, biny):
     _, _, _, binid = stats.binned_statistic_2d(x, y, None, 'count', bins=[binx, biny])
     return binid
+
+def estimate_performance(mdp, policy=None, horizon=None, n_episodes=1, gamma=0.9):
+    paths = collect_episodes(mdp, policy, horizon, n_episodes)
+
+    J = 0.
+    for p in paths:
+        df = 1
+        sum_r = 0.
+        for r in p["rewards"]:
+            sum_r += df * r
+            df *= gamma
+        J += sum_r
+    return J / n_episodes
